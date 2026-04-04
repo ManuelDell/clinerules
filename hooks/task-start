@@ -1,0 +1,24 @@
+#!/bin/bash
+# Hook: task-start
+# Prüft ob der OpenRouter AI Stack läuft und injiziert den aktuellen Status als Context.
+
+INPUT=$(cat)
+
+# Stack-Status prüfen
+ROUTER_STATUS=$(curl -s --max-time 2 http://localhost:8085/health 2>/dev/null \
+  | python3 -c "import json,sys; print(json.load(sys.stdin).get('status','?'))" 2>/dev/null \
+  || echo "offline")
+
+if [ "$ROUTER_STATUS" = "ok" ]; then
+  STATUS_LINE="Stack: ONLINE | Router=8085 Memory=8086 MCP=8087 WebUI=8088"
+else
+  STATUS_LINE="Stack: OFFLINE (Router auf localhost:8085 nicht erreichbar)"
+fi
+
+MSG="## Aktueller Stack-Status
+$STATUS_LINE
+Pfad: /data/compose/openrouter-ai-stack/
+Build: docker build -t openrouter-ai-stack/<service>:local services/<service>/
+Deploy: docker compose up -d <service>"
+
+echo "{\"cancel\": false, \"contextModification\": $(echo "$MSG" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")}"

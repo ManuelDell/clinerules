@@ -1,0 +1,36 @@
+#!/bin/bash
+# Hook: pre-tool-use
+# Schützt kritische Dateien vor versehentlichem Überschreiben.
+# .env darf nie mit write_to_file überschrieben werden (API-Keys würden verloren gehen).
+
+INPUT=$(cat)
+
+TOOL=$(echo "$INPUT" | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    print(d.get('tool', ''))
+except:
+    print('')
+" 2>/dev/null)
+
+FILE=$(echo "$INPUT" | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    p = d.get('params', {})
+    print(p.get('path', p.get('file_path', p.get('filename', ''))))
+except:
+    print('')
+" 2>/dev/null)
+
+# .env vor write_to_file schützen
+if [[ "$TOOL" == "write_to_file" || "$TOOL" == "create_file" ]]; then
+  BASENAME=$(basename "$FILE")
+  if [[ "$BASENAME" == ".env" ]]; then
+    echo '{"cancel": true, "errorMessage": ".env ist schreibgeschützt. Nutze edit_file/replace_in_file um bestehende API-Keys zu erhalten. write_to_file würde alle Keys überschreiben."}'
+    exit 0
+  fi
+fi
+
+echo '{"cancel": false}'
