@@ -56,6 +56,9 @@ Lies die zugehörige Regel **vor** dem Arbeiten:
 | Shell-Befehle ausführen | `bash.md` |
 | Git-Operationen | `git.md` |
 
+**`.clinerules/` ist read-only.** Cline schreibt nie in dieses Verzeichnis.
+Plan-Dateien → `<workspace-root>/plans/` | Generierter Code → Workspace, nicht `.clinerules/`
+
 Hooks die automatisch greifen:
 - `hooks/task-start` — prüft Umgebung und injiziert Kontext beim Taskstart
 - `hooks/pre-tool-use` — blockiert kritische Dateien vor Überschreiben

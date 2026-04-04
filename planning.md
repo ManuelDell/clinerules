@@ -8,6 +8,28 @@ Immer wenn:
 - Die Aufgabe > 3 Schritte umfasst
 - Technologieentscheidungen getroffen werden müssen
 
+## Ablageort für Plan-Dateien
+
+Plan-Dateien gehören in `<workspace-root>/plans/` — **NICHT** in `.clinerules/plans/`.
+
+`.clinerules/` ist ein gemeinsames Git-Repo (shared rules). Cline schreibt dort **nie** rein.
+Pläne sind workspace-spezifisch und gehören in das Projekt-Verzeichnis.
+
+```
+workspace-root/
+├── .clinerules/        ← shared git repo — NUR LESEN, nie beschreiben
+│   ├── rules.md
+│   └── ...
+├── plans/              ← Cline schreibt hier
+│   └── feature-name.md
+└── src/
+```
+
+`plans/` in `.gitignore` eintragen wenn Pläne nicht versioniert werden sollen.
+Oder bewusst committen wenn die Planung zum Projekt gehört — beides ist valide.
+
+---
+
 ## Pflicht-Ablauf
 
 ### 1. Recherche
