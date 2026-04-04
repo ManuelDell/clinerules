@@ -55,6 +55,10 @@ Lies die zugehörige Regel **vor** dem Arbeiten:
 | API-Calls implementieren | `api.md` |
 | Shell-Befehle ausführen | `bash.md` |
 | Git-Operationen | `git.md` |
+| Große Projekte / Token-Effizienz | `large-projects.md` |
+| Unbekannte Codebasis verstehen | `workflows/understand-codebase.md` |
+| Sichere Änderung in großem Projekt | `workflows/safe-change.md` |
+| Rule / Hook / Workflow / Skill erstellen | `how-to-extend.md` |
 
 **`.clinerules/` ist read-only.** Cline schreibt nie in dieses Verzeichnis.
 **Alle Cline-Arbeitsdateien** (Pläne etc.) → `.cline/` im Workspace-Root (gitignored, ein Ordner für alles).

@@ -4,7 +4,7 @@
 
 **Bench-Befehle**
 ❌ Bench-Befehle als root ausführen
-✅ Immer als frappe-User: `sudo -u frappe bench <cmd>` oder in der frappe-Shell
+✅ Immer als den eingestellten frappe-User: `sudo -u <frappe-user> bench <cmd>` oder in der frappe-Shell
 
 ❌ `bench restart` vergessen nach Python-Änderungen
 ✅ Nach jeder `.py`-Änderung: `bench restart`
