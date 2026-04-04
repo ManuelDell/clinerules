@@ -15,18 +15,20 @@ Plan-Dateien gehören in `<workspace-root>/plans/` — **NICHT** in `.clinerules
 `.clinerules/` ist ein gemeinsames Git-Repo (shared rules). Cline schreibt dort **nie** rein.
 Pläne sind workspace-spezifisch und gehören in das Projekt-Verzeichnis.
 
+Alle Cline-Arbeitsdateien gehören in `.cline/` im Workspace-Root — **ein einziger Ordner**, versteckt, gitignored.
+
 ```
 workspace-root/
-├── .clinerules/        ← shared git repo — NUR LESEN, nie beschreiben
-│   ├── rules.md
-│   └── ...
-├── plans/              ← Cline schreibt hier
-│   └── feature-name.md
+├── .clinerules/          ← shared git repo — NUR LESEN
+├── .cline/               ← Cline-Arbeitsverzeichnis (gitignored)
+│   └── plans/
+│       └── feature-name.md
+├── .gitignore            ← enthält: .cline/
 └── src/
 ```
 
-`plans/` in `.gitignore` eintragen wenn Pläne nicht versioniert werden sollen.
-Oder bewusst committen wenn die Planung zum Projekt gehört — beides ist valide.
+Der `task-start` Hook legt `.cline/` an und trägt es in `.gitignore` ein — automatisch, einmalig.
+So entstehen keine losen Ordner im Workspace und git-Operationen bleiben sauber.
 
 ---
 
@@ -38,7 +40,7 @@ Ziel: verstehen was existiert, was benötigt wird, was schiefgehen kann.
 
 ### 2. Plan formulieren
 
-Lege an: `plans/<projektname>.md`
+Lege an: `.cline/plans/<projektname>.md`
 Inhalt der Datei:
 
 ```markdown

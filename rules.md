@@ -57,7 +57,7 @@ Lies die zugehörige Regel **vor** dem Arbeiten:
 | Git-Operationen | `git.md` |
 
 **`.clinerules/` ist read-only.** Cline schreibt nie in dieses Verzeichnis.
-Plan-Dateien → `<workspace-root>/plans/` | Generierter Code → Workspace, nicht `.clinerules/`
+**Alle Cline-Arbeitsdateien** (Pläne etc.) → `.cline/` im Workspace-Root (gitignored, ein Ordner für alles).
 
 Hooks die automatisch greifen:
 - `hooks/task-start` — prüft Umgebung und injiziert Kontext beim Taskstart

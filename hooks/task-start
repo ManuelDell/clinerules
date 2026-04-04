@@ -1,24 +1,42 @@
 #!/bin/bash
 # Hook: task-start
-# Prüft ob der OpenRouter AI Stack läuft und injiziert den aktuellen Status als Context.
+# 1. Legt .cline/ als einziges Cline-Arbeitsverzeichnis an (gitignored)
+# 2. Injiziert Stack-Status als Context wenn OpenRouter AI Stack läuft
 
-INPUT=$(cat)
+# ── .cline/ Setup ────────────────────────────────────────────────────────────
 
-# Stack-Status prüfen
-ROUTER_STATUS=$(curl -s --max-time 2 http://localhost:8085/health 2>/dev/null \
-  | python3 -c "import json,sys; print(json.load(sys.stdin).get('status','?'))" 2>/dev/null \
-  || echo "offline")
+WORKSPACE="${PWD}"
+CLINE_DIR="${WORKSPACE}/.cline"
+GITIGNORE="${WORKSPACE}/.gitignore"
 
-if [ "$ROUTER_STATUS" = "ok" ]; then
-  STATUS_LINE="Stack: ONLINE | Router=8085 Memory=8086 MCP=8087 WebUI=8088"
+# Verzeichnisse anlegen
+mkdir -p "${CLINE_DIR}/plans"
+
+# .cline/ in .gitignore eintragen (einmalig)
+if [[ -f "$GITIGNORE" ]]; then
+    if ! grep -qxF ".cline/" "$GITIGNORE"; then
+        echo ".cline/" >> "$GITIGNORE"
+    fi
 else
-  STATUS_LINE="Stack: OFFLINE (Router auf localhost:8085 nicht erreichbar)"
+    echo ".cline/" > "$GITIGNORE"
 fi
 
-MSG="## Aktueller Stack-Status
-$STATUS_LINE
-Pfad: /data/compose/openrouter-ai-stack/
-Build: docker build -t openrouter-ai-stack/<service>:local services/<service>/
-Deploy: docker compose up -d <service>"
+# ── Stack-Status prüfen ──────────────────────────────────────────────────────
+
+ROUTER_STATUS=$(curl -s --max-time 2 http://localhost:8085/health 2>/dev/null \
+    | python3 -c "import json,sys; print(json.load(sys.stdin).get('status','?'))" 2>/dev/null \
+    || echo "offline")
+
+if [[ "$ROUTER_STATUS" == "ok" ]]; then
+    STACK_INFO="OpenRouter Stack: ONLINE (Router=8085 Memory=8086 MCP=8087 WebUI=8088)"
+else
+    STACK_INFO="OpenRouter Stack: nicht erreichbar"
+fi
+
+# ── Context zusammenstellen ──────────────────────────────────────────────────
+
+MSG="Arbeitsverzeichnis: ${WORKSPACE}
+Cline-Arbeitsdaten: ${CLINE_DIR}/ (gitignored)
+${STACK_INFO}"
 
 echo "{\"cancel\": false, \"contextModification\": $(echo "$MSG" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")}"
