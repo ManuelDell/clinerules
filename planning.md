@@ -10,24 +10,24 @@ Immer wenn:
 
 ## Ablageort für Plan-Dateien
 
-Plan-Dateien gehören in `<workspace-root>/plans/` — **NICHT** in `.clinerules/plans/`.
+Plan-Dateien gehören in `<workspace-root>/.roo/plans/` — **NICHT** in `.roorules/plans/`.
 
-`.clinerules/` ist ein gemeinsames Git-Repo (shared rules). Cline schreibt dort **nie** rein.
+`.roorules/` ist ein gemeinsames Git-Repo (shared rules). Roo schreibt dort **nie** rein.
 Pläne sind workspace-spezifisch und gehören in das Projekt-Verzeichnis.
 
-Alle Cline-Arbeitsdateien gehören in `.cline/` im Workspace-Root — **ein einziger Ordner**, versteckt, gitignored.
+Alle Roo-Arbeitsdateien gehören in `.roo/` im Workspace-Root — **ein einziger Ordner**, versteckt, gitignored.
 
 ```
 workspace-root/
-├── .clinerules/          ← shared git repo — NUR LESEN
-├── .cline/               ← Cline-Arbeitsverzeichnis (gitignored)
+├── .roorules/            ← shared git repo — NUR LESEN
+├── .roo/                 ← Roo-Arbeitsverzeichnis (gitignored)
 │   └── plans/
 │       └── feature-name.md
-├── .gitignore            ← enthält: .cline/
+├── .gitignore            ← enthält: .roo/
 └── src/
 ```
 
-Der `task-start` Hook legt `.cline/` an und trägt es in `.gitignore` ein — automatisch, einmalig.
+Der `task-start` Hook legt `.roo/` an und trägt es in `.gitignore` ein — automatisch, einmalig.
 So entstehen keine losen Ordner im Workspace und git-Operationen bleiben sauber.
 
 ---
@@ -40,7 +40,7 @@ Ziel: verstehen was existiert, was benötigt wird, was schiefgehen kann.
 
 ### 2. Plan formulieren
 
-Lege an: `.cline/plans/<projektname>.md`
+Lege an: `.roo/plans/<projektname>.md`
 Inhalt der Datei:
 
 ```markdown

@@ -1,4 +1,4 @@
-# Clinerules erweitern — Rules, Hooks, Workflows, Skills
+# Roo Rules erweitern — Rules, Hooks, Workflows
 
 Dieses Repository ist darauf ausgelegt einfach erweiterbar zu sein.
 Hier steht wie du jeden Typ hinzufügst.
@@ -7,9 +7,14 @@ Hier steht wie du jeden Typ hinzufügst.
 
 ## Rule erstellen
 
-**Wann:** Du willst Cline dauerhaft auf ein Thema / eine Technologie hinweisen.
+**Wann:** Du willst Roo dauerhaft auf ein Thema / eine Technologie hinweisen.
 
-**Datei:** `.clinerules/<name>.md` (Unterordner möglich)
+**Datei:** `<name>.md` im Repo-Root (wird via `setup.sh` in `.roorules_helper/` verfügbar)
+
+Für **mode-spezifische** Rules:
+- Gilt nur im Architect-Modus → `architect-mode.md` erweitern
+- Gilt nur im Code-Modus → `code-mode.md` erweitern
+- Gilt für alle Modi → neue `.md`-Datei + Eintrag in `rules.md`
 
 **Format:**
 ```markdown
@@ -32,12 +37,10 @@ befehl-2
 
 **Danach:** In `rules.md` in der Referenz-Tabelle eintragen:
 ```markdown
-| Situation                  | Datei          |
-|----------------------------|----------------|
-| Mein neues Thema           | `mein-thema.md`|
+| Situation          | Datei                            |
+|--------------------|----------------------------------|
+| Mein neues Thema   | `.roorules_helper/mein-thema.md` |
 ```
-
-Cline lädt alle `.md`-Dateien in `.clinerules/` automatisch — kein weiterer Setup nötig.
 
 ---
 
@@ -45,18 +48,18 @@ Cline lädt alle `.md`-Dateien in `.clinerules/` automatisch — kein weiterer S
 
 **Wann:** Du willst automatisch auf ein Tool-Event reagieren (blockieren, Context anreichern, loggen).
 
-**Datei:** `.clinerules/hooks/<event-name>` — **kein** `.sh`-Suffix, ausführbar machen:
+**Datei:** `hooks/<event-name>` — **kein** `.sh`-Suffix, ausführbar machen:
 ```bash
-chmod +x .clinerules/hooks/<event-name>
+chmod +x hooks/<event-name>
 ```
 
 **Verfügbare Events:**
 | Event           | Wann                              | Kann blockieren? |
 |-----------------|-----------------------------------|------------------|
-| `task-start`    | Beim Start jeder Cline-Session    | Nein (nur Context) |
+| `task-start`    | Beim Start jeder Roo-Session      | Nein (nur Context) |
 | `pre-tool-use`  | Vor jedem Tool-Aufruf             | Ja               |
 | `post-tool-use` | Nach jedem Tool-Aufruf            | Nein             |
-| `task-complete` | Am Ende einer Cline-Session       | Nein             |
+| `task-complete` | Am Ende einer Roo-Session         | Nein             |
 
 **Input (stdin):** JSON mit `tool` und `params`:
 ```json
@@ -105,14 +108,11 @@ except:
     print('')
 " 2>/dev/null)
 
-# Deine Logik hier:
-# if [[ "$TOOL" == "..." && "$FILE" == *"..."* ]]; then
-#   echo '{"cancel": true, "errorMessage": "..."}'
-#   exit 0
-# fi
-
+# Deine Logik hier
 echo '{"cancel": false}'
 ```
+
+Nach Erstellung: `setup.sh` ausführen damit der Hook in `.roorules/hooks/` landet.
 
 ---
 
@@ -120,7 +120,7 @@ echo '{"cancel": false}'
 
 **Wann:** Du willst einen Prozess mit mehreren Schritten dokumentieren (Checkliste, Befehlsabfolge).
 
-**Datei:** `.clinerules/workflows/<name>.md`
+**Datei:** `workflows/<name>.md`
 
 **Format:**
 ```markdown
@@ -150,41 +150,13 @@ befehl
 \`\`\`
 ```
 
-**Aufrufen:** Im Chat `lies workflows/<name>.md und führe ihn durch` oder in einer Rule referenzieren:
-```markdown
-## Lies `workflows/<name>.md` für <Situation>
-```
+**Aufrufen:** Im Chat `lies .roorules_helper/workflows/<name>.md und führe ihn durch`
+oder in einer Rule referenzieren.
 
 ---
 
-## Skill erstellen
+## Skills / Slash-Commands
 
-**Wann:** Du willst einen Slash-Befehl der Cline eine komplexe, wiederholbare Aktion ausführen lässt.
-
-**Datei:** `.clinerules/skills/<name>.md`
-
-**Aufruf im Chat:** `/name` (Cline erkennt den Dateinamen als Befehl)
-
-**Format:**
-```markdown
-# Skill: <Name>
-
-## Zweck
-Was dieser Skill macht — in einem Satz.
-
-## Ausführung
-Wenn dieser Skill aufgerufen wird, soll Cline:
-1. Schritt 1 (konkret, nicht vage)
-2. Schritt 2
-3. ...
-
-## Ausgabeformat
-Wie soll die Ausgabe aussehen? (Optional)
-
-## Parameter
-Falls der Skill Argumente nimmt: `/name <argument>`
-- `<argument>`: Was erwartet wird
-```
-
-**Wichtig:** Skills enthalten kein Shell-Code — sie sind Prompt-Templates für Cline.
-Shell-Code gehört in Hooks. Prozess-Dokumentation gehört in Workflows.
+Roo Code hat keine dedizierten `/skill`-Slash-Commands wie Cline.
+Wiederholbare Prompt-Templates gehören direkt in die zugehörige Rule-Datei
+als **"Aufrufen mit:"**-Abschnitt, oder als Workflow.

@@ -1,42 +1,66 @@
 #!/bin/bash
 # Hook: task-start
-# 1. Legt .cline/ als einziges Cline-Arbeitsverzeichnis an (gitignored)
-# 2. Injiziert Stack-Status als Context wenn OpenRouter AI Stack läuft
+# 1. Legt .roo/ als Roo-Arbeitsverzeichnis an (gitignored)
+# 2. Injiziert Memory Bank (activeContext.md) als Kontext
+# 3. Prüft OpenRouter AI Stack und zeigt Status
 
-# ── .cline/ Setup ────────────────────────────────────────────────────────────
+# ── .roo/ Setup ──────────────────────────────────────────────────────────────
 
 WORKSPACE="${PWD}"
-CLINE_DIR="${WORKSPACE}/.cline"
+ROO_DIR="${WORKSPACE}/.roo"
 GITIGNORE="${WORKSPACE}/.gitignore"
 
-# Verzeichnisse anlegen
-mkdir -p "${CLINE_DIR}/plans"
+mkdir -p "${ROO_DIR}/plans"
 
-# .cline/ in .gitignore eintragen (einmalig)
 if [[ -f "$GITIGNORE" ]]; then
-    if ! grep -qxF ".cline/" "$GITIGNORE"; then
-        echo ".cline/" >> "$GITIGNORE"
+    if ! grep -qxF ".roo/" "$GITIGNORE"; then
+        echo ".roo/" >> "$GITIGNORE"
     fi
 else
-    echo ".cline/" > "$GITIGNORE"
+    echo ".roo/" > "$GITIGNORE"
 fi
 
-# ── Stack-Status prüfen ──────────────────────────────────────────────────────
+# ── Memory Bank lesen ─────────────────────────────────────────────────────────
+
+MEMORY_DIR="$HOME/.roo/memory"
+ACTIVE_CONTEXT=""
+
+if [[ -f "$MEMORY_DIR/activeContext.md" ]]; then
+    CONTENT=$(cat "$MEMORY_DIR/activeContext.md")
+    if [[ -n "$CONTENT" && "$CONTENT" != "# activeContext" ]]; then
+        ACTIVE_CONTEXT="
+
+## Memory Bank — Active Context
+$(cat "$MEMORY_DIR/activeContext.md")"
+    fi
+fi
+
+if [[ -f "$MEMORY_DIR/progress.md" ]]; then
+    CONTENT=$(cat "$MEMORY_DIR/progress.md")
+    if [[ -n "$CONTENT" && "$CONTENT" != "# progress" ]]; then
+        ACTIVE_CONTEXT="${ACTIVE_CONTEXT}
+
+## Memory Bank — Progress
+$(cat "$MEMORY_DIR/progress.md")"
+    fi
+fi
+
+# ── Stack-Status prüfen ───────────────────────────────────────────────────────
 
 ROUTER_STATUS=$(curl -s --max-time 2 http://localhost:8085/health 2>/dev/null \
     | python3 -c "import json,sys; print(json.load(sys.stdin).get('status','?'))" 2>/dev/null \
     || echo "offline")
 
 if [[ "$ROUTER_STATUS" == "ok" ]]; then
-    STACK_INFO="OpenRouter Stack: ONLINE (Router=8085 Memory=8086 MCP=8087 WebUI=8088)"
+    STACK_INFO="OpenRouter Stack: ONLINE (Router=8085 MCP=8087 WebUI=8088)"
 else
     STACK_INFO="OpenRouter Stack: nicht erreichbar"
 fi
 
-# ── Context zusammenstellen ──────────────────────────────────────────────────
+# ── Context zusammenstellen ───────────────────────────────────────────────────
 
 MSG="Arbeitsverzeichnis: ${WORKSPACE}
-Cline-Arbeitsdaten: ${CLINE_DIR}/ (gitignored)
-${STACK_INFO}"
+Roo-Arbeitsdaten: ${ROO_DIR}/ (gitignored)
+${STACK_INFO}${ACTIVE_CONTEXT}"
 
 echo "{\"cancel\": false, \"contextModification\": $(echo "$MSG" | python3 -c "import json,sys; print(json.dumps(sys.stdin.read()))")}"
