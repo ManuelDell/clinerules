@@ -41,26 +41,26 @@ Welchen Ansatz bevorzugst du?
 
 ## Pflicht-Referenzen
 
-Lies die zugehörige Regel **vor** dem Arbeiten:
+Alle Regeldetails liegen in `.clinerules_helper/`. Lies die zugehörige Datei **vor** dem Arbeiten:
 
 | Situation | Datei |
 |---|---|
-| Neues Projekt / neue Phase | `planning.md` |
-| Recherche nötig | `research.md` |
-| Python schreiben | `python.md` |
-| JavaScript / TypeScript schreiben | `javascript.md` |
-| CSS schreiben | `css.md` |
-| Docker / Compose | `docker.md` |
-| Frappe / ERPNext | `frappe.md` |
-| API-Calls implementieren | `api.md` |
-| Shell-Befehle ausführen | `bash.md` |
-| Git-Operationen | `git.md` |
-| Große Projekte / Token-Effizienz | `large-projects.md` |
-| Unbekannte Codebasis verstehen | `workflows/understand-codebase.md` |
-| Sichere Änderung in großem Projekt | `workflows/safe-change.md` |
-| Rule / Hook / Workflow / Skill erstellen | `how-to-extend.md` |
+| Neues Projekt / neue Phase | `.clinerules_helper/planning.md` |
+| Recherche nötig | `.clinerules_helper/research.md` |
+| Python schreiben | `.clinerules_helper/python.md` |
+| JavaScript / TypeScript schreiben | `.clinerules_helper/javascript.md` |
+| CSS schreiben | `.clinerules_helper/css.md` |
+| Docker / Compose | `.clinerules_helper/docker.md` |
+| Frappe / ERPNext | `.clinerules_helper/frappe.md` |
+| API-Calls implementieren | `.clinerules_helper/api.md` |
+| Shell-Befehle ausführen | `.clinerules_helper/bash.md` |
+| Git-Operationen | `.clinerules_helper/git.md` |
+| Große Projekte / Token-Effizienz | `.clinerules_helper/large-projects.md` |
+| Unbekannte Codebasis verstehen | `.clinerules_helper/workflows/understand-codebase.md` |
+| Sichere Änderung in großem Projekt | `.clinerules_helper/workflows/safe-change.md` |
+| Rule / Hook / Workflow / Skill erstellen | `.clinerules_helper/how-to-extend.md` |
 
-**`.clinerules/` ist read-only.** Cline schreibt nie in dieses Verzeichnis.
+**`.clinerules/` ist read-only.** Cline schreibt nie in diese Verzeichnisse.
 **Alle Cline-Arbeitsdateien** (Pläne etc.) → `.cline/` im Workspace-Root (gitignored, ein Ordner für alles).
 
 Hooks die automatisch greifen:
