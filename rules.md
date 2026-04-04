@@ -1,83 +1,72 @@
-# OpenRouter AI Stack — Cline Rules
+# General Rule — Cline
 
-## Stack-Kontext
+## Umgebung zuerst prüfen
 
-**Pfad:** `/data/compose/openrouter-ai-stack/`
+**Bevor irgendwas getan wird:**
+1. `pwd` — in welchem Verzeichnis bin ich?
+2. Vorhandene Dateien, Config, existierenden Code lesen
+3. Welche Tools/Laufzeiten sind installiert? (`python --version`, `node --version`, etc.)
+4. Gibt es eine `plans/`-Datei für dieses Projekt?
 
-**Ports (extern):**
-- Router API: `8085` → intern `8080`
-- Memory Service: `8086` → intern `8081`
-- MCP Server: `8087` → intern `8082`
-- Open WebUI: `8088` → intern `8080`
-
-**Model-IDs für Cline (in das Model-Feld eingeben):**
-- Coding: `titan` | `professional` | `flitzer` (auch: `profi`, `coding-titan`, etc.)
-- Chat: `denker` | `allrounder` | `begleiter`
-- Auto-Routing: leer lassen oder `auto`
-
-**Kritische Dateien — immer zuerst lesen bevor du änderst:**
-- `.env` — API-Keys, Ports, Modell-Konfiguration
-- `services/router/app.py` — Haupt-Router-Logik
-- `services/router/models/class_router.py` — Modell-Klassen und Tier-System
-- `docker-compose.yml` — Service-Definitionen und Env-Vars
+Nie annehmen — immer prüfen. Unbekannte Umgebung → kurz fragen.
 
 ---
 
-## Build & Deploy
+## Verhalten: Erstanfrage vs. Weiterführende Anfrage
 
-**Images bauen** — KEIN `docker compose build` verwenden (kein `build:` im Compose):
-```bash
-docker build -t openrouter-ai-stack/<service>:local services/<service>/
+**Erstanfrage / Neues Projekt / Neue Projektphase:**
+Erkennbar an: kein `plans/<name>.md` vorhanden, neue Aufgabe ohne vorherigen Kontext.
+→ Pflicht-Ablauf: **Recherche → Plan → Vorlage → Warten auf Bestätigung → Ausführung**
+→ Lies `planning.md` und führe den Prozess vollständig durch.
+
+**Weiterführende Anfrage:**
+Erkennbar an: Plan-Datei existiert, Aufgabe knüpft an vorherigen Kontext an.
+→ `plans/<name>.md` öffnen, aktuellen Stand erfassen, Anfrage direkt bearbeiten.
+→ Plan nach Abschluss aktualisieren.
+
+---
+
+## Rückfragen
+
+Stelle bis zu 3 gezielte Rückfragen wenn Anforderungen unklar sind — **bevor du Code schreibst**.
+Formuliere Optionen als nummerierte Auswahl:
 ```
-
-**Service neustarten:**
-```bash
-docker compose up -d <service>
+Welchen Ansatz bevorzugst du?
+1. Variante A (schneller, weniger flexibel)
+2. Variante B (aufwändiger, erweiterbar)
 ```
-
-**Beides zusammen (Standard-Workflow):**
-```bash
-docker build -t openrouter-ai-stack/router:local services/router/ && docker compose up -d ai-router
-```
-
-**Service-Namen:** `ai-router` | `memory-svc` | `mcp-server` | `open-webui` | `redis` | `ai-searxng` | `bash-executor`
+**Triff so wenig Annahmen wie möglich.** Unklare Anforderungen führen zu falschem Code.
 
 ---
 
-## Coding-Prinzipien
+## Pflicht-Referenzen
 
-**Single Responsibility** — Jede Funktion/Klasse macht genau eine Sache.
-Wenn du "und" brauchst um zu beschreiben was sie tut, aufteilen.
+Lies die zugehörige Regel **vor** dem Arbeiten:
 
-**Open/Closed** — Neues Verhalten durch neue Funktionen oder Module,
-nie durch Änderungen in bestehender funktionierender Logik.
+| Situation | Datei |
+|---|---|
+| Neues Projekt / neue Phase | `planning.md` |
+| Recherche nötig | `research.md` |
+| Python schreiben | `python.md` |
+| JavaScript / TypeScript schreiben | `javascript.md` |
+| CSS schreiben | `css.md` |
+| Docker / Compose | `docker.md` |
+| Frappe / ERPNext | `frappe.md` |
+| API-Calls implementieren | `api.md` |
+| Shell-Befehle ausführen | `bash.md` |
+| Git-Operationen | `git.md` |
 
-**DRY** — Logik existiert genau einmal. Mehr als 2 kopierte Zeilen → Helper extrahieren.
-Model-IDs, URLs, Schwellenwerte kommen aus Env-Vars, nie als Literals.
-
-**KISS** — Einfachsten Code schreiben der funktioniert. Flat function > class. Dict > ORM.
-Keine spekulativen Abstraktionen. Keine vorzeitige Optimierung.
-
-**Dependency Inversion** — Abhängigkeiten auf Abstraktionen (Env-Vars, Base-URLs),
-nicht auf konkrete Implementierungen (hardcodierte Modellnamen, direkte DB-Pfade).
-
----
-
-## Projekt-Regeln
-
-- Neue Services → `services/<name>/`
-- Jeder neue Endpoint braucht `/health` oder ist über `/health` des Routers erreichbar
-- Kosten werden nach **jedem** OpenRouter API-Call getrackt — nie überspringen
-- Alle Konfiguration über Env-Vars — nichts hardcoden
-- Neue Images pushen nach: `ghcr.io/manueldell/openrouter-ai-stack/<name>:latest`
-- Dispatchers sind zustandslos — kein globaler mutabler State
+Hooks die automatisch greifen:
+- `hooks/task-start` — prüft Umgebung und injiziert Kontext beim Taskstart
+- `hooks/pre-tool-use` — blockiert kritische Dateien vor Überschreiben
 
 ---
 
-## Was du NICHT tun sollst
+## Universelle Coding-Regeln
 
-- `docker compose build` aufrufen — funktioniert nicht (kein `build:` in compose)
-- `.env` mit `write_to_file` überschreiben — immer `edit_file` nutzen
-- Modellnamen hardcoden — immer Env-Vars oder class_router.py-Defaults
-- Tests mocken die eigentlich echte Services testen sollten
-- Features hinzufügen die nicht explizit angefragt wurden
+**Kein Code zweimal.** Logik existiert einmal — referenzieren statt kopieren.
+**Keine Annahmen über Umgebung.** Immer prüfen was tatsächlich vorhanden ist.
+**Kleinste funktionierende Einheit.** Erst minimal, dann erweitern wenn nötig.
+**Kein Code ohne Zweck.** Kein Boilerplate, keine spekulativen Features, kein "könnte später nützlich sein".
+**Fehler sofort sichtbar machen.** Lieber crash mit klarer Meldung als stilles Fehlverhalten.
+**Änderungen lesen bevor schreiben.** Jede Datei die geändert wird zuerst vollständig lesen.
