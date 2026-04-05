@@ -73,7 +73,36 @@ Kein `git add -A` blind. Kein Commit mit fehlschlagenden Tests.
 
 ---
 
+## Fortschritts-Check — kein stiller Abbruch
+
+Zähle interne Tool-Runden mit. Nach **20 Runden** ohne messbaren Fortschritt
+(gleiche Fehler wiederholen sich, kein neuer Dateistatus, zirkuläre Fixes): **STOPP.**
+
+1. Erkläre dem User was versucht wurde
+2. Benenne die Blockade klar (warum es nicht funktioniert)
+3. Frage explizit: *"Soll ich mit einem anderen Ansatz weitermachen? [Ja/Nein + Hinweis]"*
+
+Nie stumm weiterarbeiten wenn ein Plan offensichtlich nicht greift.
+
+---
+
+## Kontext-Verwaltung bei langen Aufgaben
+
+Wenn der Kontext-Indikator von Roo **lang** wird — proaktiv handeln, nicht warten:
+
+1. `~/.roo/memory/activeContext.md` updaten:
+   - Aktuelle Aufgabe + Stand
+   - Offene Dateien + relevante Änderungen
+   - Nächster konkreter Schritt
+2. `~/.roo/memory/progress.md` updaten: was ist erledigt, was kommt
+3. Nach Context-Reset liest der Task-Start-Hook die Memory Bank automatisch → kein Kontext-Verlust
+
+**Nie auf den Kontext-Reset warten — proaktiv sichern bevor der Kontext voll ist.**
+
+---
+
 ## Modell-Mapping
 
-Code-Modus → `qwen/qwen3-coder-next` via OpenRouter-Stack (Router-Klasse: TITAN_PAID)
-Token-effizient durch Diff-Editing. Stark bei Code-Generation und Tool-Calls.
+Code-Modus → `code-auto` via OpenRouter-Stack (Router-Klasse: `professional`)
+Fallback-Kette: Qwen3-Coder:free → Llama-3.3-70B:free → DeepSeek-V3.2
+Alle Modelle tool-fähig. Token-effizient durch Diff-Editing.
